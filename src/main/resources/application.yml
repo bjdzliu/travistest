@@ -1,0 +1,50 @@
+server:
+  port: 8080
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}
+    prefer-ip-address: true
+    lease-expiration-duration-in-seconds: 15
+    lease-renewal-interval-in-seconds: 5
+  client:
+    registry-fetch-interval-seconds: 5
+    service-url:
+      defaultZone: ${EUREKA_SERVER_LIST}
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          strategy: SEMAPHORE
+          thread:
+            timeoutInMilliseconds: 5000
+  metrics:
+    enabled: true
+    polling-interval-ms: 5000
+  shareSecurityContext: true
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+      filter:
+        remove-non-proxy-headers:
+          headers:
+          - dummy
+      routes:
+        - id:  MytestT
+          uri: lb://MytestTY
+          predicates:
+          - Path=/MytestTY/**
+      default-filters:
+        - name: Hystrix
+          args:
+            name: fallback
+            fallbackUri: forward:/MytestTYg
+        - name: RequestUriAuth
+logging:
+  level:
+    root: ERROR
