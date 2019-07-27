@@ -2,3 +2,6 @@ language: java
 dist: xenial
 before_install: "sudo apt-get update"
 script: mvn clean compile package -Dmaven.test.skip=true
+branches:
+  only:
+    - master
